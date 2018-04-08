@@ -1,11 +1,11 @@
-def parseArgs(args):
+def parse_args(args):
     opts = {}
-    optsLen = len(args)
+    opts_len = len(args)
 
     i = 0
 
     try:
-        while i < optsLen:
+        while i < opts_len:
             opts[args[i]] = args[i+1]
             i = i+2
     except IndexError:
