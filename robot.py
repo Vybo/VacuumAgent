@@ -11,7 +11,11 @@ class Robot:
     # Sensor function
     def can_move_to_room(self, room):
         # Room should be accessible only if it has a distance of exactly 1 in every direction, it is unlocked and the robot is not currently in it.
-        if room.accessible and abs(self.current_room.x - room.x) == 1 and abs(self.current_room.y - room.y) == 1:
+        if room != False and \
+        room.accessible and \
+        ((abs(self.current_room.x - room.x) == 1 and abs(self.current_room.y - room.y) == 0) or \
+        (abs(self.current_room.x - room.x) == 0 and abs(self.current_room.y - room.y) == 1))\
+        :
             return True
         else:
             return False

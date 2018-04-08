@@ -5,11 +5,12 @@ if enable_visualization:
 
 accessible_value = 0
 inaccessible_value = 4
-dirty_value = 2.1
+dirty_value = 2.9
 visited_value = 2
 cleaned_value = 1
+robot_value = 3.5
 
-def visualize_maze_state(maze):
+def visualize_maze_state(maze, robot):
     if enable_visualization:
 
         matrix = np.zeros(shape=(maze.size, maze.size))
@@ -24,7 +25,7 @@ def visualize_maze_state(maze):
                 elif maze.rooms[x][y].accessible:
                     matrix[y, x] = dirty_value
 
-
+        matrix[robot.current_room.y, robot.current_room.x] = robot_value
 
         fig = plt.figure()
         ax = fig.add_subplot(1 ,1, 1)
