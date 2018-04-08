@@ -40,7 +40,7 @@ def load():
                 error_messages.coordinates_over_n(maze_size)
                 return False
 
-            return Maze(maze_size, inaccessible_rooms)
+        return Maze(maze_size, inaccessible_rooms)
 
     else:
         error_messages.required_parameter_missing("-c")
