@@ -27,19 +27,21 @@ def load():
         return False
 
     if "-c" in arguments.keys():
-        chess_coordinates = arguments["c"].split(",")
+        chess_coordinates = arguments["-c"].split(",")
         chess_x_coordinates = [helper.chess_coordinate_to_x(x) for x in chess_coordinates]
         chess_y_coordinates = [helper.chess_coordinate_to_y(y) for y in chess_coordinates]
 
         inaccessible_rooms = []
-        if len(chess_x_coordinates)-1 < maze_size and len(chess_y_coordinates)-1 < maze_size:
-            for i in range(0, len(chess_x_coordinates)):
+
+        for i in range(0, len(chess_x_coordinates)):
+            if chess_x_coordinates[i] < maze_size and chess_y_coordinates[i] < maze_size:
                 inaccessible_rooms.append(Room(chess_x_coordinates[i], chess_y_coordinates[i], False))
+            else:
+                error_messages.coordinates_over_n(maze_size)
+                return False
 
             return Maze(maze_size, inaccessible_rooms)
-        else:
-            error_messages.coordinates_over_n(maze_size)
-            return False
+
     else:
         error_messages.required_parameter_missing("-c")
         return False
