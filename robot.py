@@ -43,3 +43,28 @@ class Robot:
         if self.should_vacuum_room(self.current_room):
             self.current_room.clean()
             self.total_cleans += 1
+
+    def room_preferability(self, for_room):
+        if for_room == False:
+            return -1.0
+
+        avg_x = 0
+        avg_y = 0
+
+        for room in self.visited_rooms:
+            avg_x += room.x
+            avg_y += room.y
+
+        avg_x = avg_x / len(self.visited_rooms)
+        avg_y = avg_y / len(self.visited_rooms)
+
+        vector = {'x': for_room.x - avg_x, 'y': for_room.y - avg_y}
+        # vector['x'] = vector['x'] * -1
+        # vector['y'] = vector['y'] * -1
+
+        if vector['y'] < 0.0:
+            return vector['y']
+        elif vector['x'] < 0.0:
+            return vector['x']
+        else:
+            return 1.0
