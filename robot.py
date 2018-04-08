@@ -26,11 +26,15 @@ class Robot:
         else:
             return True
 
+    def vacuum_current_room(self):
+        self.current_room.clean()
+        self.total_cleans += 1
+
     def move_to_room(self, new_room):
         # Check if the robot can move to a different room is outside this class, in the main engine 'vacuum.py'.
         self.current_room = new_room
         self.current_room.visit()
 
-        if self.should_vacuum_room(self, self.current_room):
+        if self.should_vacuum_room(self.current_room):
             self.current_room.clean()
             self.total_cleans += 1
