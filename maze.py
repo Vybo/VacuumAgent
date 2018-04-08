@@ -8,3 +8,11 @@ class Maze:
 
         for room in inaccessible_rooms:
             self.rooms[room.x][room.y] = room
+
+    # def room_for_coordinates(self, x, y):
+    #     for room in self.rooms:
+    #         if self.rooms[room].x == x and self.rooms[room].y == y:
+    #             return room
+    #             break
+    #
+    #     return False

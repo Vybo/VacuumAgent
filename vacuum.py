@@ -50,6 +50,8 @@ def load():
 maze = load()
 
 if maze:
+    # Coordinate system is starting at [0,0] which is left-bottom corner, corresponding to coordinate a1, h8 would be [7,7].
+    robot = Robot(maze.rooms[0][7])
     exit(0)
 else:
     print("Terminated with errors.")
