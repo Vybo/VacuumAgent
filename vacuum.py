@@ -51,7 +51,10 @@ def tick():
     if robot.should_vacuum_room(robot.current_room):
         robot.vacuum_current_room()
 
-    if robot.can_move_to_room(maze.rooms[robot.current_room.x][robot.current_room.y+1]):
+    if robot.can_move_to_room(maze.room_to_bottom(robot.current_room)):
+        robot.move_to_room(maze.room_to_bottom(robot.current_room))
+    else:
+
 
 
 maze = load()

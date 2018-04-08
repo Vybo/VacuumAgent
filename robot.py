@@ -5,7 +5,7 @@ class Robot:
 
     def __init__(self, starting_room):
         self.current_room = starting_room
-        self.visited_rooms = [] # The robots memory, storing rooms it has already visited and cleaned.
+        self.visited_rooms = [self.current_room]  # The robots memory, storing rooms it has already visited and cleaned.
         self.total_cleans = 0
 
     # Sensor function
@@ -34,6 +34,7 @@ class Robot:
         # Check if the robot can move to a different room is outside this class, in the main engine 'vacuum.py'.
         self.current_room = new_room
         self.current_room.visit()
+        self.visited_rooms.append(self.current_room)
 
         if self.should_vacuum_room(self.current_room):
             self.current_room.clean()
