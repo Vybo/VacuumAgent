@@ -5,6 +5,7 @@ from room import Room
 from maze import Maze
 import error_messages
 import helper
+import visualizer
 
 
 arguments = argsparser.parse_args(sys.argv[1:])
@@ -52,6 +53,7 @@ maze = load()
 if maze:
     # Coordinate system is starting at [0,0] which is left-bottom corner, corresponding to coordinate a1, h8 would be [7,7].
     robot = Robot(maze.rooms[0][7])
+    visualizer.visualize_maze_state(maze)
     exit(0)
 else:
     print("Terminated with errors.")

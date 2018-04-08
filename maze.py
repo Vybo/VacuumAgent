@@ -5,6 +5,7 @@ class Maze:
 
     def __init__(self, size, inaccessible_rooms):
         self.rooms = [[Room(x, y, True) for x in range(size)] for y in range(size)]
+        self.size = size-1
 
         for room in inaccessible_rooms:
             self.rooms[room.x][room.y] = room
