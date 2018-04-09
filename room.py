@@ -14,7 +14,7 @@ class Room:
     def visit(self):
         self.visited += 1
 
-    def clean(self):
+    def vacuum(self):
         self.cleaned = True
 
     def lock(self):

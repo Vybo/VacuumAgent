@@ -19,3 +19,7 @@ def chess_coordinate_to_y(coordinate):
     except ValueError:
         error_messages.wrong_coordinate(coordinate)
         return False
+
+
+def coordinate_to_chess(coordinate):
+    return chr(coordinate+ord('a'))

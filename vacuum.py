@@ -8,15 +8,21 @@ import helper
 import visualizer
 from time import sleep
 
-
 arguments = argsparser.parse_args(sys.argv[1:])
 
 maze = 0
 robot = 0
-
+inaccessible_rooms = []
 
 def load():
     maze_size = 0
+
+    if "-v" in arguments.keys():
+        try:
+            if bool(arguments["-v"]):
+                visualizer.enable_visualization = True
+        except ValueError:
+            error_messages.value_boolean_error()
 
     if "-n" in arguments.keys():
         try:
@@ -32,8 +38,6 @@ def load():
         chess_coordinates = arguments["-c"].split(",")
         chess_x_coordinates = [helper.chess_coordinate_to_x(x) for x in chess_coordinates]
         chess_y_coordinates = [helper.chess_coordinate_to_y(y) for y in chess_coordinates]
-
-        inaccessible_rooms = []
 
         for i in range(0, len(chess_x_coordinates)):
             if chess_x_coordinates[i] < maze_size and chess_y_coordinates[i] < maze_size:
@@ -57,60 +61,87 @@ def tick():
     top_preferability = robot.room_preferability(maze.room_to_top(robot.current_room))
     bottom_preferability = robot.room_preferability(maze.room_to_bottom(robot.current_room))
 
-    if robot.can_move_to_room(maze.room_to_bottom(robot.current_room)) and robot.should_vacuum_room(maze.room_to_bottom(robot.current_room)):
-        robot.move_to_room(maze.room_to_bottom(robot.current_room))
-    elif robot.can_move_to_room(maze.room_to_right(robot.current_room)) and robot.should_vacuum_room(maze.room_to_right(robot.current_room)):
-        robot.move_to_room(maze.room_to_right(robot.current_room))
-    elif robot.can_move_to_room(maze.room_to_top(robot.current_room)) and robot.should_vacuum_room(maze.room_to_top(robot.current_room)):
-        robot.move_to_room(maze.room_to_top(robot.current_room))
-    elif robot.can_move_to_room(maze.room_to_left(robot.current_room)) and robot.should_vacuum_room(maze.room_to_left(robot.current_room)):
-        robot.move_to_room(maze.room_to_left(robot.current_room))
-    elif robot.can_move_to_room(maze.room_to_right(robot.current_room)) and (right_preferability >= left_preferability and right_preferability >= top_preferability and right_preferability >= bottom_preferability):
-        robot.move_to_room(maze.room_to_right(robot.current_room))
-    elif robot.can_move_to_room(maze.room_to_top(robot.current_room)) and (top_preferability >= left_preferability and top_preferability >= right_preferability and top_preferability >= bottom_preferability):
-        robot.move_to_room(maze.room_to_top(robot.current_room))
-    elif robot.can_move_to_room(maze.room_to_bottom(robot.current_room)) and (bottom_preferability >= left_preferability and bottom_preferability >= top_preferability and bottom_preferability >= right_preferability):
-        robot.move_to_room(maze.room_to_bottom(robot.current_room))
-    elif robot.can_move_to_room(maze.room_to_left(robot.current_room)) and (left_preferability >= right_preferability and left_preferability >= top_preferability and left_preferability >= bottom_preferability):
-        robot.move_to_room(maze.room_to_left(robot.current_room))
+    preferred_room = 0
 
-    # elif robot.can_move_to_room(maze.room_to_bottom(robot.current_room)):
-    #     robot.move_to_room(maze.room_to_bottom(robot.current_room))
-    # elif robot.can_move_to_room(maze.room_to_right(robot.current_room)):
-    #     robot.move_to_room(maze.room_to_right(robot.current_room))
-    # elif robot.can_move_to_room(maze.room_to_top(robot.current_room)):
-    #     robot.move_to_room(maze.room_to_top(robot.current_room))
-    # elif robot.can_move_to_room(maze.room_to_left(robot.current_room)):
-    #     robot.move_to_room(maze.room_to_left(robot.current_room))
+    room_to_bottom = maze.room_to_bottom(robot.current_room)
+    room_to_top = maze.room_to_top(robot.current_room)
+    room_to_right = maze.room_to_right(robot.current_room)
+    room_to_left = maze.room_to_left(robot.current_room)
+
+    # If room is in current direction to which robot is heading and is not cleaned, assign it to preferred room.
+    if robot.room_in_current_direction(room_to_bottom) and robot.can_move_to_room(room_to_bottom) and robot.should_vacuum_room(room_to_bottom):
+        # preferred_room = room_to_bottom
+        robot.move_to_room(room_to_bottom)
+        visualizer.visualize_maze_state(maze, robot)
+        return True
+    elif robot.room_in_current_direction(room_to_left) and robot.can_move_to_room(room_to_left) and robot.should_vacuum_room(room_to_left):
+        robot.move_to_room(room_to_left)
+        visualizer.visualize_maze_state(maze, robot)
+        return True
+    elif robot.room_in_current_direction(room_to_right) and robot.can_move_to_room(room_to_right) and robot.should_vacuum_room(room_to_right):
+        robot.move_to_room(room_to_right)
+        visualizer.visualize_maze_state(maze, robot)
+        return True
+    elif robot.room_in_current_direction(room_to_top) and robot.can_move_to_room(room_to_top) and robot.should_vacuum_room(room_to_top):
+        robot.move_to_room(room_to_top)
+        visualizer.visualize_maze_state(maze, robot)
+        return True
     else:
-        last_room = 0
-        for room in reversed(robot.visited_rooms):
-            last_room = room
+        # Backtrack until unclean room found
+        backtracking_path = robot.visited_rooms[:-1]
+        dirty_room_next_to_robot = robot.should_vacuum_room(room_to_bottom) or robot.should_vacuum_room(
+            room_to_top) or robot.should_vacuum_room(room_to_left) or robot.should_vacuum_room(
+            room_to_right)
 
-            if robot.should_vacuum_room(maze.room_to_left(robot.current_room)) and robot.can_move_to_room(maze.room_to_left(robot.current_room)):
-                robot.move_to_room(maze.room_to_left(robot.current_room))
-                break
-            elif robot.should_vacuum_room(maze.room_to_top(robot.current_room)) and robot.can_move_to_room(maze.room_to_top(robot.current_room)):
-                robot.move_to_room(maze.room_to_top(robot.current_room))
-                break
-            elif robot.should_vacuum_room(maze.room_to_right(robot.current_room)) and robot.can_move_to_room(maze.room_to_right(robot.current_room)):
-                robot.move_to_room(maze.room_to_right(robot.current_room))
-                break
-            elif robot.should_vacuum_room(maze.room_to_bottom(robot.current_room)) and robot.can_move_to_room(maze.room_to_bottom(robot.current_room)):
-                robot.move_to_room(maze.room_to_bottom(robot.current_room))
-                break
-            else:
-                robot.move_to_room(room)
+        while dirty_room_next_to_robot == False:
+            try:
+                robot.move_to_room(backtracking_path[-1])
+                backtracking_path = backtracking_path[:-1]
+
+            except IndexError:
+                visualizer.visualize_maze_state(maze, robot)
+                return False
+
+            room_to_bottom = maze.room_to_bottom(robot.current_room)
+            room_to_top = maze.room_to_top(robot.current_room)
+            room_to_right = maze.room_to_right(robot.current_room)
+            room_to_left = maze.room_to_left(robot.current_room)
 
             visualizer.visualize_maze_state(maze, robot)
 
-        robot.visited_rooms = robot.visited_rooms[0:robot.visited_rooms.index(last_room)]
-        # visualizer.visualize_maze_state(maze, robot)
-        return True  # Returned after robot finished cleaning and returned to charging station.
+            dirty_room_next_to_robot = robot.should_vacuum_room(room_to_bottom) or robot.should_vacuum_room(
+                room_to_top) or robot.should_vacuum_room(room_to_left) or robot.should_vacuum_room(
+                room_to_right)
 
-    visualizer.visualize_maze_state(maze, robot)
-    return True  # Returned if everything goes well
+        # robot.visited_rooms = backtracking_path[:-1]
+        return True
 
+def print_results():
+    counter = 0
+
+    for x in range(len(maze.rooms)-1):
+        for y in range(len(maze.rooms[x])-1):
+            counter += maze.rooms[x][y].visited
+
+    print("[Results] Total squares visited: %(counter)i" %{'counter': counter})
+    print("[Results] Visited sequence follows:")
+
+    sequence = []
+    for i in range(len(robot.visited_rooms)-1):
+        sequence.append(helper.coordinate_to_chess(robot.visited_rooms[i].x) + str(robot.visited_rooms[i].y))
+        if i%10 == 0:
+            sequence.append('\n')
+        print(", ".join(sequence))
+    print("[Results] Used maze follows:.")
+
+    sequence = []
+    for i in range(len(inaccessible_rooms)-1):
+        sequence.append(helper.coordinate_to_chess(inaccessible_rooms[i].x) + str(inaccessible_rooms[i].y))
+        if i % 10 == 0:
+            sequence.append('\n')
+
+    print(", ".join(sequence))
+    print("[Results] Finished.")
 
 maze = load()
 
@@ -118,8 +149,10 @@ if maze:
     # Coordinate system is starting at [0,0] which is left-bottom corner, corresponding to coordinate a1, h8 would be [7,7].
     robot = Robot(maze.rooms[0][7])
     while tick():
-        sleep(0.1)
+        # sleep(0.2)
         continue
+
+    print_results()
     exit(0)
 else:
     print("Terminated with errors.")

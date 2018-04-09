@@ -6,7 +6,7 @@ class Robot:
     def __init__(self, starting_room):
         self.current_room = starting_room
         self.visited_rooms = [self.current_room]  # The robots memory, storing rooms it has already visited and cleaned.
-        self.total_cleans = 0
+        self.total_vacuums = 0
 
     # Sensor function
     def can_move_to_room(self, room):
@@ -25,14 +25,16 @@ class Robot:
     def should_vacuum_room(self, room):
         visited_rooms_set = frozenset(self.visited_rooms)
 
-        if room in visited_rooms_set:
+        if room == False or self.can_move_to_room(room) == False:
+            return False
+        elif room in visited_rooms_set or room.accessible != True:
             return False
         else:
             return True
 
     def vacuum_current_room(self):
-        self.current_room.clean()
-        self.total_cleans += 1
+        self.current_room.vacuum()
+        self.total_vacuums += 1
 
     def move_to_room(self, new_room):
         # Check if the robot can move to a different room is outside this class, in the main engine 'vacuum.py'.
@@ -41,8 +43,23 @@ class Robot:
         self.visited_rooms.append(self.current_room)
 
         if self.should_vacuum_room(self.current_room):
-            self.current_room.clean()
-            self.total_cleans += 1
+            self.current_room.vacuum()
+            self.total_vacuums += 1
+
+    def reset_memory_to_current(self):
+        self.visited_rooms = self.visited_rooms[0:self.visited_rooms.index(self.current_room)]
+
+    def room_in_current_direction(self, new_room):
+        if new_room == False:
+            return False
+        elif new_room == self.visited_rooms[len(self.visited_rooms)-1]:
+            return False
+        elif new_room.x == self.current_room.x and new_room.y != self.current_room.y:
+            return True
+        elif new_room.y == self.current_room.y and new_room.x != self.current_room.x:
+            return True
+        else:
+            return False
 
     def room_preferability(self, for_room):
         if for_room == False:

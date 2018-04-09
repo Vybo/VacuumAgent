@@ -1,6 +1,8 @@
 def value_integer_error():
     print("[Loading Error] Supplied wrong value for parameter '-n'. Expected value is UNSIGNED INTEGER.")
 
+def value_boolean_error():
+    print("[Loading Warning] Supplied wrong value for parameter '-n'. Expected value is BOOLEAN.")
 
 def required_parameter_missing(parameter):
     print("[Loading Error] Required parameter %(parameter)s not supplied." %{"parameter": parameter})

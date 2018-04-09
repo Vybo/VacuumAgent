@@ -1,4 +1,5 @@
 enable_visualization = True
+
 if enable_visualization:
     import numpy as np
     import matplotlib.pylab as plt
