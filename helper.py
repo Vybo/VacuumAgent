@@ -15,7 +15,12 @@ def chess_coordinate_to_x(coordinate):
 
 def chess_coordinate_to_y(coordinate):
     try:
-        return int(coordinate[1:2])-1
+        if len(coordinate) == 3:
+            return int(coordinate[1:3])-1
+        elif len(coordinate) == 2:
+            return int(coordinate[1:2])-1
+        else:
+            return False
     except ValueError:
         error_messages.wrong_coordinate(coordinate)
         return False

@@ -14,15 +14,11 @@ maze = 0
 robot = 0
 inaccessible_rooms = []
 
+render_to_video = visualizer.rendering_available
+visualizer.enable_visualization = visualizer.rendering_available
+
 def load():
     maze_size = 0
-
-    if "-v" in arguments.keys():
-        try:
-            if bool(arguments["-v"]):
-                visualizer.enable_visualization = True
-        except ValueError:
-            error_messages.value_boolean_error()
 
     if "-n" in arguments.keys():
         try:
@@ -52,6 +48,14 @@ def load():
         error_messages.required_parameter_missing("-c")
         return False
 
+
+def handle_visualization_request():
+    if visualizer.enable_visualization:
+        if render_to_video:
+            visualizer.render_maze_state(maze, robot)
+        else:
+            visualizer.visualize_maze_state(maze, robot)
+
 def tick():
     if robot.should_vacuum_room(robot.current_room):
         robot.vacuum_current_room()
@@ -72,19 +76,19 @@ def tick():
     if robot.room_in_current_direction(room_to_bottom) and robot.can_move_to_room(room_to_bottom) and robot.should_vacuum_room(room_to_bottom):
         # preferred_room = room_to_bottom
         robot.move_to_room(room_to_bottom)
-        visualizer.visualize_maze_state(maze, robot)
+        handle_visualization_request()
         return True
     elif robot.room_in_current_direction(room_to_left) and robot.can_move_to_room(room_to_left) and robot.should_vacuum_room(room_to_left):
         robot.move_to_room(room_to_left)
-        visualizer.visualize_maze_state(maze, robot)
+        handle_visualization_request()
         return True
     elif robot.room_in_current_direction(room_to_right) and robot.can_move_to_room(room_to_right) and robot.should_vacuum_room(room_to_right):
         robot.move_to_room(room_to_right)
-        visualizer.visualize_maze_state(maze, robot)
+        handle_visualization_request()
         return True
     elif robot.room_in_current_direction(room_to_top) and robot.can_move_to_room(room_to_top) and robot.should_vacuum_room(room_to_top):
         robot.move_to_room(room_to_top)
-        visualizer.visualize_maze_state(maze, robot)
+        handle_visualization_request()
         return True
     else:
         # Backtrack until unclean room found
@@ -99,7 +103,7 @@ def tick():
                 backtracking_path = backtracking_path[:-1]
 
             except IndexError:
-                visualizer.visualize_maze_state(maze, robot)
+                handle_visualization_request()
                 return False
 
             room_to_bottom = maze.room_to_bottom(robot.current_room)
@@ -107,7 +111,7 @@ def tick():
             room_to_right = maze.room_to_right(robot.current_room)
             room_to_left = maze.room_to_left(robot.current_room)
 
-            visualizer.visualize_maze_state(maze, robot)
+            handle_visualization_request()
 
             dirty_room_next_to_robot = robot.should_vacuum_room(room_to_bottom) or robot.should_vacuum_room(
                 room_to_top) or robot.should_vacuum_room(room_to_left) or robot.should_vacuum_room(
@@ -123,7 +127,6 @@ def print_results():
         for y in range(len(maze.rooms[x])-1):
             counter += maze.rooms[x][y].visited
 
-    print("[Results] Total squares visited: %(counter)i" %{'counter': counter})
     print("[Results] Visited sequence follows:")
 
     sequence = []
@@ -141,13 +144,20 @@ def print_results():
             sequence.append('\n')
 
     print(", ".join(sequence))
+
+    print("[Results] Total squares visited: %(counter)i" %{'counter': counter})
+
+    if render_to_video and visualizer.enable_visualization:
+        print("[Results] Rendering video to out.mp4")
+        visualizer.render_video("out.mp4")
+
     print("[Results] Finished.")
 
 maze = load()
 
 if maze:
     # Coordinate system is starting at [0,0] which is left-bottom corner, corresponding to coordinate a1, h8 would be [7,7].
-    robot = Robot(maze.rooms[0][7])
+    robot = Robot(maze.rooms[0][maze.size-1])
     while tick():
         # sleep(0.2)
         continue

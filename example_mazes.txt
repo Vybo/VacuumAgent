@@ -1,2 +1,11 @@
 Figure 1 maze [n=8]:
     a2,b2,c2,d2,f1,g3,e4,h4,c5,d5,f5,b6,b7,f7,g7
+
+Figure 1 maze [n=6]:
+    a2,b2,c2,d2,f1,e4,c5,d5,f5
+
+Figure 1 maze [n=10]:
+    a2,b2,c2,d2,f1,g3,e4,h4,c5,d5,f5,b6,b7,f7,g7,b8,e8,g8,i4,b9,e9,g9,j4
+
+Figure 1 maze [n=12]:
+    a2,b2,c2,d2,f1,g3,e4,h4,c5,d5,f5,b6,b7,f7,g7,b8,e8,g8,i4,b9,e9,g9,j4,b10,b11,e10,e11,g10,g11,k4

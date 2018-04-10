@@ -1,0 +1,1 @@
+python vacuum.py -n 8 -c a2,b2,c2,d2,f1,g3,e4,h4,c5,d5,f5,b6,b7,f7,g7
